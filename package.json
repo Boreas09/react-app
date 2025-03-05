@@ -10,7 +10,12 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "get-starknet-core": "workspace:*",
+    "get-starknet-ui": "workspace:*",
+    "starknet": "workspace:*",
+    "bignumber.js": "^9.1.2",
+    "ethers": "^6.13.5"
   },
   "scripts": {
     "start": "react-scripts start",
