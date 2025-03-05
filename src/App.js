@@ -29,7 +29,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "http://localhost:3000",
+          nodeUrl: "https://alpha-deployment.rosettanet.io",
         },
         selectedAccount
       );
@@ -61,7 +61,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "http://localhost:3000",
+          nodeUrl: "https://alpha-deployment.rosettanet.io",
         },
         selectedAccount
       );
@@ -161,7 +161,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "http://localhost:3000",
+          nodeUrl: "https://alpha-deployment.rosettanet.io",
         },
         selectedAccount
       );
@@ -191,7 +191,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "http://localhost:3000",
+          nodeUrl: "https://alpha-deployment.rosettanet.io",
         },
         selectedAccount
       );
