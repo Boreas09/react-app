@@ -11,8 +11,24 @@ import { parseEther } from "ethers";
 export default function App() {
   const [walletName, setWalletName] = useState("");
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [blockNumber, setBlockNumber] = useState("0x0");
-  const [chainId, setChainId] = useState("0x0");
+  const [callMethodResults, setCallMethodResults] = useState({
+    blockNumber: "",
+    chainId: "",
+    estimateGas: "",
+    gasPrice: "",
+    getBalance: "",
+    getBlockByHash: "",
+    getBlockByNumber: "",
+    getBlockTransactionCountByHash: "",
+    getBlockTransactionCountByNumber: "",
+    getCode: "",
+    getTransactionHashByBlockHashAndIndex: "",
+    getTransactionHashByBlockNumberAndIndex: "",
+    getTransactionByHash: "",
+    getTransactionCount: "",
+    getTransactionReceipt: "",
+    permissions: "",
+  });
 
   function handleConnect() {
     return async () => {
@@ -23,7 +39,7 @@ export default function App() {
     };
   }
 
-  async function getblockNumber() {
+  async function getCallMethods() {
     let rAccount;
 
     if (selectedAccount) {
@@ -37,19 +53,168 @@ export default function App() {
       console.log("Please connect with get-starknet");
     }
 
+    const tx = {
+      from: rAccount.address,
+      to: rAccount.address,
+      value: "0x9184e72a",
+    };
+
     if (rAccount) {
       try {
-        await rAccount.walletProvider
-          .request({ method: "eth_blockNumber" })
-          .then((res) => {
-            console.log(res);
-            setBlockNumber(res);
-          });
+        await rAccount.blockNumberRosettanet().then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            blockNumber: parseInt(res, 16),
+          }));
+        });
 
         await rAccount.chainIdRosettanet().then((res) => {
           console.log(res);
-          setChainId(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            chainId: res,
+          }));
         });
+
+        await rAccount.getPermissionsRosettanet().then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            permissions: res,
+          }));
+        });
+
+        await rAccount.estimateGasRosettanet(tx).then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            estimateGas: res,
+          }));
+        });
+
+        await rAccount.gasPriceRosettanet().then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            gasPrice: res,
+          }));
+        });
+
+        await rAccount.getBalanceRosettanet(rAccount.address).then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            getBalance: res,
+          }));
+        });
+
+        await rAccount
+          .getBlockByHashRosettanet(
+            "0x44e35afdc050293af1263eda16c324ed53efdb4de9f1ef9cf3b5732171631e7"
+          )
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getBlockByHash: res,
+            }));
+          });
+
+        await rAccount.getBlockByNumberRosettanet("0x123").then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            getBlockByNumber: res,
+          }));
+        });
+
+        await rAccount
+          .getBlockTransactionCountByHashRosettanet(
+            "0x44e35afdc050293af1263eda16c324ed53efdb4de9f1ef9cf3b5732171631e7"
+          )
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getBlockTransactionCountByHash: res,
+            }));
+          });
+
+        await rAccount
+          .getBlockTransactionCountByNumberRosettanet("0x123")
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getBlockTransactionCountByNumber: res,
+            }));
+          });
+
+        await rAccount.getCodeRosettanet(rAccount.address).then((res) => {
+          console.log(res);
+          setCallMethodResults((prev) => ({
+            ...prev,
+            getCode: res,
+          }));
+        });
+
+        await rAccount
+          .getTransactionHashByBlockHashAndIndexRosettanet(
+            "0x44e35afdc050293af1263eda16c324ed53efdb4de9f1ef9cf3b5732171631e7",
+            1
+          )
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getTransactionHashByBlockHashAndIndex: res,
+            }));
+          });
+
+        await rAccount
+          .getTransactionHashByBlockNumberAndIndexRosettanet("0x123", 1)
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getTransactionHashByBlockNumberAndIndex: res,
+            }));
+          });
+
+        await rAccount
+          .getTransactionByHashRosettanet(
+            "0x7f963911128c444a231748fb461c8caf568d0893532e3de81342cea3fce600a"
+          )
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getTransactionByHash: res,
+            }));
+          });
+
+        await rAccount
+          .getTransactionCountRosettanet(rAccount.address)
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getTransactionCount: res,
+            }));
+          });
+
+        await rAccount
+          .getTransactionReceiptRosettanet(
+            "0x7f963911128c444a231748fb461c8caf568d0893532e3de81342cea3fce600a"
+          )
+          .then((res) => {
+            console.log(res);
+            setCallMethodResults((prev) => ({
+              ...prev,
+              getTransactionReceipt: res,
+            }));
+          });
       } catch (e) {
         console.log(e);
       }
@@ -262,16 +427,16 @@ export default function App() {
       </p>
       <div>
         <button onClick={handleConnect()}>Connect With get-starknet</button>
-        <button onClick={getblockNumber}>
-          Get Block Number of Starknet Sepolia & Rosettanet Chain Id
-        </button>
+        <button onClick={getCallMethods}>Get Call Methods</button>
         <button onClick={signMessage}>Sign Message</button>
         <button onClick={sendTransaction}>Send 1 STRK</button>
         <button onClick={xStrk}>xSTRK</button>
       </div>
-      <p>Block Number : {parseInt(blockNumber, 16)}</p>
-      <p>chainId : {chainId}</p>
       <p>Wallet Name : {walletName}</p>
+      <p>Call Methods : </p>
+      <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+        {JSON.stringify(callMethodResults, null, 2)}
+      </pre>
     </div>
   );
 }
