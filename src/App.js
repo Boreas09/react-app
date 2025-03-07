@@ -77,13 +77,13 @@ export default function App() {
           }));
         });
 
-        await rAccount.getPermissionsRosettanet().then((res) => {
-          console.log(res);
-          setCallMethodResults((prev) => ({
-            ...prev,
-            permissions: res,
-          }));
-        });
+        // await rAccount.getPermissionsRosettanet().then((res) => {
+        //   console.log(res);
+        //   setCallMethodResults((prev) => ({
+        //     ...prev,
+        //     permissions: res,
+        //   }));
+        // });
 
         await rAccount.estimateGasRosettanet(tx).then((res) => {
           console.log(res);
@@ -412,6 +412,30 @@ export default function App() {
     }
   }
 
+  async function changetoRosettanet() {
+    let rAccount;
+    if (selectedAccount) {
+      rAccount = await RosettanetAccount.connect(
+        {
+          nodeUrl: "https://alpha-deployment.rosettanet.io",
+        },
+        selectedAccount
+      );
+    } else {
+      console.log("Please connect with get-starknet");
+    }
+
+    if (rAccount) {
+      try {
+        await rAccount.switchChainRosettanet().then((res) => {
+          console.log(res);
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
   return (
     <div>
       <h2>Connect With Starknet.js</h2>
@@ -427,6 +451,9 @@ export default function App() {
       </p>
       <div>
         <button onClick={handleConnect()}>Connect With get-starknet</button>
+        <button onClick={changetoRosettanet}>
+          Change Network to Rosettanet
+        </button>
         <button onClick={getCallMethods}>Get Call Methods</button>
         <button onClick={signMessage}>Sign Message</button>
         <button onClick={sendTransaction}>Send 1 STRK</button>
