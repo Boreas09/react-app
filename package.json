@@ -7,15 +7,15 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
+    "bignumber.js": "^9.1.2",
+    "ethers": "^6.13.5",
+    "get-starknet-core": "workspace:*",
+    "get-starknet-ui": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4",
-    "get-starknet-core": "workspace:*",
-    "get-starknet-ui": "workspace:*",
     "starknet": "workspace:*",
-    "bignumber.js": "^9.1.2",
-    "ethers": "^6.13.5"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

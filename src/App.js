@@ -6,7 +6,7 @@ import {
   prepareMulticallCalldata,
 } from "./prepareCalldata";
 import BigNumber from "bignumber.js";
-import { parseEther } from "ethers";
+import { parseEther, AbiCoder } from "ethers";
 
 export default function App() {
   const [walletName, setWalletName] = useState("");
@@ -368,35 +368,43 @@ export default function App() {
       const snAddress =
         "0x" + (await getStarknetAddress(rAccount.address)).toString(16);
       const starkAmount = cairo.uint256(parseEther("1"));
-      const calldata = [
-        {
-          to: "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
-          entrypoint:
+
+      const encoder = new AbiCoder();
+
+      const calldataDecoded = [
+        [
+          [
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
             "0x0219209e083275171774dab1df80982e9df2096516f06319c5c6d71ae0a8480c",
-          calldata: [
+            [
+              "0x042de5b868da876768213c48019b8d46cd484e66013ae3275f8a4b97b31fc7eb",
+              "0x" + new BigNumber(starkAmount.low).toString(16),
+              "0x" + new BigNumber(starkAmount.high).toString(16),
+            ],
+          ],
+          [
             "0x042de5b868da876768213c48019b8d46cd484e66013ae3275f8a4b97b31fc7eb",
-            new BigNumber(starkAmount.low).toString(16),
-            new BigNumber(starkAmount.high).toString(16),
-          ],
-        },
-        {
-          to: "0x042de5b868da876768213c48019b8d46cd484e66013ae3275f8a4b97b31fc7eb",
-          entrypoint:
             "0x00c73f681176fc7b3f9693986fd7b14581e8d540519e27400e88b8713932be01",
-          calldata: [
-            new BigNumber(starkAmount.low).toString(16),
-            new BigNumber(starkAmount.high).toString(16),
-            snAddress,
+            [
+              "0x" + new BigNumber(starkAmount.low).toString(16),
+              "0x" + new BigNumber(starkAmount.high).toString(16),
+              snAddress,
+            ],
           ],
-        },
+        ],
       ];
 
-      const call = await prepareMulticallCalldata(calldata);
+      const calldataEncoded = encoder.encode(
+        ["tuple(uint256,uint256,uint256[])[]"],
+        calldataDecoded
+      );
+
+      const calldata = "0x76971d7f" + calldataEncoded.replace("0x", "");
 
       const unsignedTx = {
         from: rAccount.address,
         to: rAccount.address,
-        data: call,
+        data: calldata,
         value: "0x0",
       };
 
