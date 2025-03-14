@@ -1,12 +1,56 @@
 import React, { useState } from "react";
 import { RosettanetAccount, cairo } from "starknet";
 import { connect } from "get-starknet-ui";
-import {
-  getStarknetAddress,
-  prepareMulticallCalldata,
-} from "./prepareCalldata";
+import { getStarknetAddress } from "./prepareCalldata";
 import BigNumber from "bignumber.js";
 import { parseEther, AbiCoder } from "ethers";
+
+const snTx = {
+  type: "INVOKE_FUNCTION",
+  contractAddress:
+    "0x0239d830fcff445b380b53473e8907cb32bfd8fe68579a76a4014382f931e2b1",
+  calldata: [
+    "0x2",
+    "0xaa79a8e98e1c8fac6fe4dd0e677d01bf1ca5f419",
+    "0x1",
+    "0x98af802404e21",
+    "0x98af802404e21",
+    "0x0",
+    "0x5208",
+    "0xde0b6b3a7640000",
+    "0x0",
+    "0x0",
+  ],
+  version: "0x3",
+  signature: [
+    "0x88552c4d654b9f2270d022ed565f4ada",
+    "0x3d481d75612b44edf05122ea41e019bf",
+    "0x159b964f5040b54abd479f852b185bf3",
+    "0x41ee1fa020cde5ade8cb8e394603c0ce",
+    "0x1b",
+    "0xde0b6b3a7640000",
+    "0x0",
+  ],
+  nonce: "0xb",
+  max_fee: "0x0",
+  resourceBounds: {
+    l1_gas: {
+      max_amount: "0x5280",
+      max_price_per_unit: "0x5280",
+    },
+    l2_gas: {
+      max_amount: "0x0",
+      max_price_per_unit: "0x0",
+    },
+  },
+  tip: "0x0",
+  paymasterData: [],
+  accountDeploymentData: [],
+  nonceDataAvailabilityMode: "L1",
+  feeDataAvailabilityMode: "L1",
+};
+
+const node = "http://localhost:3000";
 
 export default function App() {
   const [walletName, setWalletName] = useState("");
@@ -30,6 +74,30 @@ export default function App() {
     permissions: "",
   });
 
+  const [starknetCallMethodResults, setStarknetCallMethodResults] = useState({
+    chainId: "",
+    blockNumber: "",
+    getBlockLatestAccepted: "",
+    getSpecVersion: "",
+    getNonceForAddress: "",
+    getBlockWithTxHashes: "",
+    getBlockWithTxs: "",
+    getBlockWithReceipts: "",
+    getBlockStateUpdate: "",
+    getBlockTransactionsTraces: "",
+    getBlockTransactionCount: "",
+    getTransactionByHash: "",
+    getTransactionByBlockIdAndIndex: "",
+    getTransactionReceipt: "",
+    getTransactionTrace: "",
+    getTransactionStatus: "",
+    simulateTransaction: "",
+    getClassHashAt: "",
+    getClass: "",
+    getClassAt: "",
+    getInvokeEstimateFee: "",
+  });
+
   function handleConnect() {
     return async () => {
       const res = await connect();
@@ -39,13 +107,13 @@ export default function App() {
     };
   }
 
-  async function getCallMethods() {
+  async function getRosettanetCallMethods() {
     let rAccount;
 
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "https://alpha-deployment.rosettanet.io",
+          nodeUrl: node,
         },
         selectedAccount
       );
@@ -221,12 +289,250 @@ export default function App() {
     }
   }
 
+  async function getStarknetJSCallMethods() {
+    let rAccount;
+    if (selectedAccount) {
+      rAccount = await RosettanetAccount.connect(
+        {
+          nodeUrl: node,
+        },
+        selectedAccount
+      );
+    } else {
+      console.log("Please connect with get-starknet");
+    }
+    try {
+      const snAddress = await getStarknetAddress(rAccount.address);
+
+      await rAccount.getChainId().then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          chainId: res,
+        }));
+      });
+
+      await rAccount.getBlockNumber().then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          blockNumber: res,
+        }));
+      });
+
+      await rAccount.getBlockLatestAccepted().then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockLatestAccepted: res,
+        }));
+      });
+
+      await rAccount.getSpecVersion().then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getSpecVersion: res,
+        }));
+      });
+
+      await rAccount.getNonceForAddress(snAddress).then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getNonceForAddress: res,
+        }));
+      });
+
+      await rAccount.getBlockWithTxHashes("latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockWithTxHashes: res,
+        }));
+      });
+
+      await rAccount.getBlockWithTxs("latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockWithTxs: res,
+        }));
+      });
+
+      await rAccount.getBlockWithReceipts("latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockWithReceipts: res,
+        }));
+      });
+
+      await rAccount.getBlockStateUpdate("latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockStateUpdate: res,
+        }));
+      });
+
+      await rAccount.getBlockTransactionsTraces().then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockTransactionsTraces: res,
+        }));
+      });
+
+      await rAccount.getBlockTransactionCount("latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getBlockTransactionCount: res,
+        }));
+      });
+
+      await rAccount
+        .getTransactionByHash(
+          "0x7f963911128c444a231748fb461c8caf568d0893532e3de81342cea3fce600a"
+        )
+        .then((res) => {
+          console.log(res);
+          setStarknetCallMethodResults((prev) => ({
+            ...prev,
+            getTransactionByHash: res,
+          }));
+        });
+
+      await rAccount
+        .getTransactionByBlockIdAndIndex("latest", 1)
+        .then((res) => {
+          console.log(res);
+          setStarknetCallMethodResults((prev) => ({
+            ...prev,
+            getTransactionByBlockIdAndIndex: res,
+          }));
+        });
+
+      await rAccount
+        .getTransactionReceipt(
+          "0x7f963911128c444a231748fb461c8caf568d0893532e3de81342cea3fce600a"
+        )
+        .then((res) => {
+          console.log(res);
+          setStarknetCallMethodResults((prev) => ({
+            ...prev,
+            getTransactionReceipt: res,
+          }));
+        });
+
+      await rAccount
+        .getTransactionTrace(
+          "0x7f963911128c444a231748fb461c8caf568d0893532e3de81342cea3fce600a"
+        )
+        .then((res) => {
+          console.log(res);
+          setStarknetCallMethodResults((prev) => ({
+            ...prev,
+            getTransactionTrace: res,
+          }));
+        });
+
+      await rAccount
+        .getTransactionStatus(
+          "0x7f963911128c444a231748fb461c8caf568d0893532e3de81342cea3fce600a"
+        )
+        .then((res) => {
+          console.log(res);
+          setStarknetCallMethodResults((prev) => ({
+            ...prev,
+            getTransactionStatus: res,
+          }));
+        });
+
+      //! HATA VAR GETCLASSAT İSTEĞİ GÖNDERİYOR FAKAT GÖNDERİRKEN ETH ADRESİNİ GÖNDERİYOR
+      //! SN ADDRESS OLMADIĞI İÇİN HATA VERİYOR.
+      // await rAccount
+      //   .simulateTransaction(snTx, {
+      //     skipFeeCharge: true,
+      //     skipValidate: true,
+      //   })
+      //   .then((res) => {
+      //     console.log(res);
+      //     setStarknetCallMethodResults((prev) => ({
+      //       ...prev,
+      //       simulateTransaction: res,
+      //     }));
+      //   });
+
+      await rAccount.getClassHashAt(snAddress, "latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getClassHashAt: res,
+        }));
+      });
+
+      await rAccount
+        .getClass(
+          "0x04b7ccebfb848b8d8e62808718de698afcb529b36885c2927ae4fbafc5a18a81"
+        )
+        .then((res) => {
+          console.log(res);
+          setStarknetCallMethodResults((prev) => ({
+            ...prev,
+            getClass: res,
+          }));
+        });
+
+      await rAccount.getClassAt(snAddress, "latest").then((res) => {
+        console.log(res);
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getClassAt: res,
+        }));
+      });
+
+      await rAccount.getInvokeEstimateFee(snTx).then((res) => {
+        console.log(res);
+        const result = {
+          data_gas_consumed: res.data_gas_consumed.toString(),
+          data_gas_price: res.data_gas_price.toString(),
+          gas_consumed: res.gas_consumed.toString(),
+          gas_price: res.gas_price.toString(),
+          overall_fee: res.overall_fee.toString(),
+          resourceBounds: {
+            l1_gas: {
+              max_amount: res.resourceBounds.l1_gas.max_amount.toString(),
+              max_price_per_unit:
+                res.resourceBounds.l1_gas.max_price_per_unit.toString(),
+            },
+            l2_gas: {
+              max_amount: res.resourceBounds.l2_gas.max_amount.toString(),
+              max_price_per_unit:
+                res.resourceBounds.l2_gas.max_price_per_unit.toString(),
+            },
+          },
+          suggestedMaxFee: res.suggestedMaxFee.toString(),
+          unit: res.unit,
+        };
+
+        setStarknetCallMethodResults((prev) => ({
+          ...prev,
+          getInvokeEstimateFee: result,
+        }));
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async function signMessage() {
     let rAccount;
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "https://alpha-deployment.rosettanet.io",
+          nodeUrl: node,
         },
         selectedAccount
       );
@@ -326,7 +632,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "https://alpha-deployment.rosettanet.io",
+          nodeUrl: node,
         },
         selectedAccount
       );
@@ -356,7 +662,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "https://alpha-deployment.rosettanet.io",
+          nodeUrl: node,
         },
         selectedAccount
       );
@@ -365,8 +671,7 @@ export default function App() {
     }
 
     if (rAccount) {
-      const snAddress =
-        "0x" + (await getStarknetAddress(rAccount.address)).toString(16);
+      const snAddress = await getStarknetAddress(rAccount.address);
       const starkAmount = cairo.uint256(parseEther("1"));
 
       const encoder = new AbiCoder();
@@ -425,7 +730,7 @@ export default function App() {
     if (selectedAccount) {
       rAccount = await RosettanetAccount.connect(
         {
-          nodeUrl: "https://alpha-deployment.rosettanet.io",
+          nodeUrl: node,
         },
         selectedAccount
       );
@@ -436,6 +741,54 @@ export default function App() {
     if (rAccount) {
       try {
         await rAccount.switchChainRosettanet().then((res) => {
+          console.log(res);
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
+  async function declare() {
+    let rAccount;
+    if (selectedAccount) {
+      rAccount = await RosettanetAccount.connect(
+        {
+          nodeUrl: node,
+        },
+        selectedAccount
+      );
+    } else {
+      console.log("Please connect with get-starknet");
+    }
+
+    if (rAccount) {
+      try {
+        await rAccount.declare().then((res) => {
+          console.log(res);
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
+  async function deploy() {
+    let rAccount;
+    if (selectedAccount) {
+      rAccount = await RosettanetAccount.connect(
+        {
+          nodeUrl: node,
+        },
+        selectedAccount
+      );
+    } else {
+      console.log("Please connect with get-starknet");
+    }
+
+    if (rAccount) {
+      try {
+        await rAccount.deploy().then((res) => {
           console.log(res);
         });
       } catch (e) {
@@ -462,16 +815,40 @@ export default function App() {
         <button onClick={changetoRosettanet}>
           Change Network to Rosettanet
         </button>
-        <button onClick={getCallMethods}>Get Call Methods</button>
+        <button onClick={getRosettanetCallMethods}>
+          Get Rosettanet Call Methods
+        </button>
+        <button onClick={getStarknetJSCallMethods}>
+          Get StarknetJS Call Methods
+        </button>
         <button onClick={signMessage}>Sign Message</button>
         <button onClick={sendTransaction}>Send 1 STRK</button>
         <button onClick={xStrk}>xSTRK</button>
+        <button onClick={declare}>Declare</button>
+        <button onClick={deploy}>Deploy</button>
       </div>
       <p>Wallet Name : {walletName}</p>
-      <p>Call Methods : </p>
-      <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-        {JSON.stringify(callMethodResults, null, 2)}
-      </pre>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ width: "50%" }}>
+          <p>Rosettanet Get Methods : </p>
+          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            {JSON.stringify(callMethodResults, null, 2)}
+          </pre>
+        </div>
+        <div style={{ width: "50%" }}>
+          <p>StarknetJS Get Methods : </p>
+          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            {JSON.stringify(starknetCallMethodResults, null, 2)}
+          </pre>
+        </div>
+      </div>
     </div>
   );
 }
